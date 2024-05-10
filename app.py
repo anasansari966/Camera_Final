@@ -63,8 +63,8 @@ def capture():
     # Calculate the score
     global score_response
     score_response = calculate_score()
-    if score_response.get("error"):
-        return jsonify(score_response)
+    if score_response:
+        return score_response
 
     return jsonify({"message": "Captured Successfully.", "score":  score_response})
 
