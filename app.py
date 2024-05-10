@@ -112,7 +112,7 @@ def calculate_score():
     # Calculate percentage similarity
     percent_similarity = (1 - mse / max_possible_error) * 100
 
-    return {"percentage_similarity": percent_similarity}
+    return {percent_similarity}
 
 @app.route("/vc-webhook/webhook", methods=["POST"])
 def webhook():
