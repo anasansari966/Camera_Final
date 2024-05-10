@@ -141,6 +141,11 @@ def webhook():
                         "trigger": 4
                     },
                     {
+                        "label": "Home",
+                        "value": "Home",
+                        "trigger": 3
+                    },
+                    {
                         "label": "End Chat",
                         "value": "End Chat",
                         "trigger": 26
