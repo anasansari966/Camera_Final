@@ -4,8 +4,9 @@ import cv2
 import numpy as np
 from skimage.metrics import mean_squared_error
 from flask_cors import CORS
+import json
 
-app = Flask(__name__) 
+app = Flask(__name__)
 cors = CORS(app, resource={
 
     r"/*": {
@@ -28,18 +29,21 @@ app.config['ORIGINAL_FOLDER'] = ORIGINAL_FOLDER
 
 # Counter for naming captured images
 capture_counter = 0
+score_response = 0
 
 # Variables to store the paths of the original and captured images
 original_img_path = None
 captured_img_path = None
 
 
-@app.route('/ping')
+@app.route('/vc-webhook/ping')
 def ping_pong():
     return "PONG"
 
 
-@app.route('/capture', methods=['POST'])
+
+
+@app.route('/vc-webhook/capture', methods=['POST'])
 def capture():
     global capture_counter
     global original_img_path
@@ -57,6 +61,7 @@ def capture():
     captured_img_path = image_path
 
     # Calculate the score
+    global score_response
     score_response = calculate_score()
     if score_response.get("error"):
         return jsonify(score_response)
@@ -64,7 +69,7 @@ def capture():
     return jsonify({"message": "Captured Successfully.", "score": score_response["percentage_similarity"]})
 
 
-@app.route('/original_upload', methods=['POST'])
+@app.route('/vc-webhook/original_upload', methods=['POST'])
 def original_upload():
     global original_img_path
 
@@ -109,6 +114,44 @@ def calculate_score():
 
     return {"percentage_similarity": percent_similarity}
 
+@app.route("/vc-webhook/webhook", methods=["POST"])
+def webhook():
+    intent = request.form.get('intent')
+    data = json.loads(intent)
+    print(data)
+    action = data['fulfillment']['action']
+
+    if action == "image-captured-score":
+        score = score_response
+        buttons = []
+        buttons_item = {
+            "id": 18,
+            "message": f"score: {score}<br> total uploads:{capture_counter}",
+            "metadata": {
+                "payload": [
+                    {
+                        "label": "Capture",
+                        "value": "Capture",
+                        "trigger": 17
+                    },
+                    {
+                        "label": "Status",
+                        "value": "Status",
+                        "trigger": 4
+                    }
+                ],
+                "templateId": 6
+            },
+            "userInput": False
+        }
+
+        buttons.append(buttons_item)
+
+        # Construct JSON response with buttons
+
+        updated_json = json.dumps(buttons_item)
+        return updated_json
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
