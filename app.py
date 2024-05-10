@@ -133,7 +133,7 @@ def webhook():
                     {
                         "label": "Capture",
                         "value": "Capture",
-                        "trigger": 17
+                        "trigger": 18
                     },
                     {
                         "label": "Status",
