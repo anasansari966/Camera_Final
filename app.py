@@ -66,7 +66,7 @@ def capture():
     if score_response.get("error"):
         return jsonify(score_response)
 
-    return jsonify({"message": "Captured Successfully.", "score": score_response["percentage_similarity"]})
+    return jsonify({"message": "Captured Successfully.", "score":  score_response})
 
 
 @app.route('/vc-webhook/original_upload', methods=['POST'])
@@ -112,7 +112,8 @@ def calculate_score():
     # Calculate percentage similarity
     percent_similarity = (1 - mse / max_possible_error) * 100
 
-    return (percent_similarity)
+    return percent_similarity
+
 
 @app.route("/vc-webhook/webhook", methods=["POST"])
 def webhook():
@@ -140,47 +141,9 @@ def webhook():
                         "trigger": 4
                     },
                     {
-                    "label": "End Chat",
-                    "value": "End Chat",
-                    "trigger": 26
-                }
-                ],
-                "templateId": 6
-            },
-            "userInput": False
-        }
-
-        buttons.append(buttons_item)
-
-        # Construct JSON response with buttons
-
-        updated_json = json.dumps(buttons_item)
-        return updated_json
-
-@app.route("/vc-webhook/webhook", methods=["POST"])
-def webhook():
-    intent = request.form.get('intent')
-    data = json.loads(intent)
-    print(data)
-    action = data['fulfillment']['action']
-
-    if action == "image-captured-score":
-        score = score_response
-        buttons = []
-        buttons_item = {
-            "id": 18,
-            "message": f"score: {score}<br> total uploads:{capture_counter}",
-            "metadata": {
-                "payload": [
-                    {
-                        "label": "Capture",
-                        "value": "Capture",
-                        "trigger": 17
-                    },
-                    {
-                        "label": "Status",
-                        "value": "Status",
-                        "trigger": 4
+                        "label": "End Chat",
+                        "value": "End Chat",
+                        "trigger": 26
                     }
                 ],
                 "templateId": 6
@@ -197,4 +160,4 @@ def webhook():
 
 
 if __name__ == '__main__':
-  app.run()
+    app.run()
